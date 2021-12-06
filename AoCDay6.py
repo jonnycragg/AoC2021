@@ -1,85 +1,63 @@
+from collections import Counter
+
 def readData(file):
     myData = []  # Declare an empty list
     with open(file, 'rt') as myfile:  # Open lorem.txt for reading text.
         for line in myfile:  # For each line of text,
             cleanline = line.replace(" ", "").replace("\n", "")
             myData = cleanline.split(',')
-    return myData
+            myData = [int(i) for i in myData]
+    return Counter(myData)
 
-def calcSpawnNumbers(data, days):
-    # sorting them so always incrementing
-    data.sort()
+def calcSpawnNumbers(data):
     length = len(data)
-    for x in data:
+    #print("Calc spawn numbers: " + str(data) + ", length=" + str(length))
+    spawning = {}
+    for k, v in data.items():
+        #print("key=" + str(k) + ", count=" + str(v))
+        if k == 0:  # k becomes a 6 and it spawns an 8
+            try:
+                spawning[6] += v
+            except KeyError:
+                spawning[6] = v
+            try:
+                spawning[8] += v
+            except KeyError:
+                spawning[8] = v
+        if (k > 0) and (k < 9):  # k decreases by 1 only
+            try:
+                spawning[k-1] += v
+            except KeyError:
+                spawning[k-1] = v
+    #print(spawning)
+    #print(Counter(spawning))
+    return Counter(spawning)
 
-
-    x1 = coords[0][0]
-    y1 = coords[0][1]
-    x2 = coords[1][0]
-    y2 = coords[1][1]
-    # now work out is incrementing x or y
-    if x1 == x2:
-        while y1+1 < y2:
-            coords.append((x1, y1+1))
-            y1 = y1 + 1
-    if y1 == y2:
-        while x1+1 < x2:
-            coords.append((x1+1, y1))
-            x1 = x1 + 1
-
-#    print("getCoordsBetween: " + str(coords) + "numbs are: " + str(x1) + str(y1) + str(x2) + str(y2) )
-    return coords
-
-def getDIACoordsBetween(coords):
-    # sorting them so always going upwards
-    coords.sort()
-    x1 = coords[0][0]
-    y1 = coords[0][1]
-    x2 = coords[1][0]
-    y2 = coords[1][1]
-    # now work out if incrementing both x and y
-    if (x2 > x1) and (y2 > y1):
-        while (y1+1 < y2) and (x1+1 < x2):
-            coords.append((x1+1, y1+1))
-            y1 = y1 + 1
-            x1 = x1 + 1
-
-    if (x2 > x1) and (y2 < y1):
-        while (y1-1 > y2) and (x1+1 < x2):
-            coords.append((x1+1, y1-1))
-            y1 = y1 - 1
-            x1 = x1 + 1
-
-#    print("getCoordsBetween: " + str(coords) + "numbs are: " + str(x1) + str(y1) + str(x2) + str(y2) )
-    return coords
-
-def horv(start,end):
-    # x1 = x2 OR y1 = y2
-    #print(start[0])
-    if start[0] == end[0]:
-        return True
-    if start[1] == end[1]:
-        return True
-    return False
-
-def myCoordsCount(data):
-    from collections import Counter
-    counter = Counter(data)
-    #print(counter)
+def mySpawnCount(data):
     answer = 0
-    for k, v in counter.items():
-        if v > 1:
-            answer = answer + 1
-    print(answer)
+    for k, v in data.items():
+        answer = answer + v
+    return answer
 
 if (__name__ == "__main__"):
     myInput = readData('testinputDay6.txt')
-    print(myInput)
-#    myCoordsCount(myInput)
+    #print("OK, so i think: " + str(myInput))
+    i = 0
+    #print("Day " + str(i) + ": " + str(myInput))
+    while i < 256:
+        i = i + 1
+        myInput = calcSpawnNumbers(myInput)
+        #print("Day " + str(i) + ": " + str(myInput))
+    print("OK, so i think number of creatures = " + str(mySpawnCount(myInput)))
+#   print("Test data with days: 80, total = " + str(calcSpawnNumbers(myInput)))
 
     myInput = readData('realinputDay6.txt')
-    print(myInput)
-#    myCoordsCount(myInput)
-
+    i = 0
+    # print("Day " + str(i) + ": " + str(myInput))
+    while i < 256:
+        i = i + 1
+        myInput = calcSpawnNumbers(myInput)
+        # print("Day " + str(i) + ": " + str(myInput))
+    print("OK, so i think number of creatures = " + str(mySpawnCount(myInput)))
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
